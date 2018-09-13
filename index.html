@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Movie data</title>
+    <style>
+        #filtsrch {
+            max-height: 10px;
+            overflow: hidden;
+        }
+        
+        .card {
+            box-shadow: 0 0 3px #888888;
+        }
+    </style>
+</head>
+
+<body id="bd">
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <a class="navbar-brand" href="#">Movie analysis</a>
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">All your data at your fingertip</a>
+            </li>
+            <li class="nav-item active">
+                <button class="btn btn-danger" id="ref">Refresh</button>
+            </li>
+            <li class="nav-item">
+                <span>.............. </span>
+            </li>
+            <li class="nav-item">
+                <button class="btn btn-info" id="drk">Dark Theme</button>
+            </li>
+        </ul>
+    </nav>
+    <div id="dthr"></div>
+    <div class="container" id="ctn">
+        <div class="row">
+            <br><br>
+        </div>
+        <div class="row">
+            <span class="col-md-2 col-sm-2 col-lg-2 col-xl-2"></span>
+            <div class="col-md-5 col-lg-5 col-sm-5 col-xs-5">
+                <input type="text" list="filtsrch" placeholder="Search Genres, language, country, budget, title year " id="flt" class="form-control" />
+            </div>
+            <button class="btn btn-primary col-md-1 col-sm-1 col-lg-1 col-xl-1" id="srch">Search</button>
+        </div>
+        <div class="row">
+            <br><br>
+        </div>
+
+        <div class="row">
+            <span class="col-md-2 col-sm-2 col-lg-2 col-xl-2"></span>
+            <div id="insert" class="col-md-8 col-lg-8 col-xl-8 col-sm-8 col-xs-8">
+
+            </div>
+
+            <span class="col-md-2 col-sm-2 col-lg-2 col-xl-2"></span>
+        </div>
+        <div class="row">
+            <br>
+        </div>
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/js/bootstrap.min.js"></script>
+    <script>
+        var ckg = 0;
+        window.onload = function() {
+            //alert("hey");
+            createDataList();
+            cmflag();
+            document.getElementById("srch").onclick = function() {
+                filter(document.getElementById("flt").value);
+            };
+            document.getElementById("ref").onclick = function() {
+                cmflag();
+                document.getElementById("flt").value = "";
+            };
+            document.getElementById("drk").onclick = function() {
+                if (ckg == 1) {
+
+                    document.getElementById("drk").innerText = "Dark theme";
+                    document.getElementById("bd").style.backgroundColor = "#F7F0EF";
+                    ckg = 0;
+                    cmflag();
+                    document.getElementById("flt").value = "";
+                } else {
+                    document.getElementById("drk").innerText = "Light theme";
+                    document.getElementById("bd").style.backgroundColor = "#857B79";
+                    var x = document.getElementsByClassName("card");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        x[i].style.backgroundColor = "#7A7776";
+                    }
+                    var y = document.getElementsByTagName("p");
+                    for (i = 0; i < x.length; i++) {
+                        y[i].style.color = "#DACDCA";
+                    }
+                    ckg = 1;
+                }
+            };
+        };
+
+        function createDataList() {
+            var xmlhttp = new XMLHttpRequest();
+            var dt = document.getElementById("dthr");
+            var lang = document.createElement("datalist");
+            lang.id = "filtsrch";
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var myObj = JSON.parse(this.responseText);
+                    for (var i = 0; i < myObj.length; i++) {
+                        var opt1 = document.createElement("option");
+                        var opt2 = document.createElement("option");
+                        var opt3 = document.createElement("option");
+                        var opt4 = document.createElement("option");
+                        var opt5 = document.createElement("option");
+                        opt1.value = myObj[i].genres;
+                        opt2.value = myObj[i].language;
+                        opt3.value = myObj[i].country;
+                        opt4.value = myObj[i].budget;
+                        opt5.value = myObj[i].title_year;
+                        lang.appendChild(opt1);
+                        lang.appendChild(opt2);
+                        lang.appendChild(opt3);
+                        lang.appendChild(opt4);
+                        lang.appendChild(opt5);
+                    }
+                    dt.appendChild(lang);
+                }
+            };
+            xmlhttp.open("GET", "http://starlord.hackerearth.com/movieslisting", true);
+            xmlhttp.send();
+        }
+
+        function cmflag() {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var myObj = JSON.parse(this.responseText);
+                    var ins = document.getElementById("insert");
+                    ins.innerHTML = " ";
+
+                    for (var i = 0; i < myObj.length; i++) {
+
+                        var div1 = document.createElement("div");
+                        div1.className = "card";
+
+                        var div2 = document.createElement("div");
+                        div2.className = "card-body";
+                        var p1 = document.createElement("p");
+                        var p2 = document.createElement("p");
+                        var p3 = document.createElement("p");
+
+                        p1.innerText = "Movie Name: " + myObj[i].movie_title + "          ||| Genres:  " + myObj[i].genres + "              ||| Year: " + myObj[i].title_year +
+                            "              ||| Country: " + myObj[i].country + "          ||| Language: " + myObj[i].language;
+                        p1.appendChild(document.createElement("hr"));
+                        p2.innerHTML = "Director Name: " + myObj[i].director_name + " ||||| Actor 1: " + myObj[i].actor_1_name + " ||| Actor 2: " + myObj[i].actor_2_name +
+                            " |||| Content Rating: " + myObj[i].content_rating + " ||| Budget: " + myObj[i].budget;
+                        p2.appendChild(document.createElement("hr"));
+                        p3.innerText = "Plot Keywords: " + myObj[i].plot_keywords + " ||| IMDB link: ";
+                        var aa = document.createElement("a");
+
+                        aa.href = myObj[i].movie_imdb_link;
+                        aa.innerText = "Check out here";
+                        p3.appendChild(aa);
+                        p3.appendChild(document.createElement("br"));
+                        div2.appendChild(p1);
+                        div2.appendChild(p2);
+                        div2.appendChild(p3);
+                        div1.appendChild(div2);
+                        ins.appendChild(div1);
+                        ins.appendChild(document.createElement("br"));
+
+
+                    }
+                }
+            };
+            xmlhttp.open("GET", "http://starlord.hackerearth.com/movieslisting", true);
+            xmlhttp.send();
+        }
+
+        function filter(value) {
+            var xmlhttp = new XMLHttpRequest();
+
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var myObj = JSON.parse(this.responseText);
+                    alert("Searched");
+                    var ins = document.getElementById("insert");
+                    ins.innerHTML = " ";
+
+                    for (var i = 0; i < myObj.length; i++) {
+                        if (myObj[i].genres == value || myObj[i].language == value || myObj[i].country == value || myObj[i].budget == value || myObj[i].title_year == value) {
+                            var div1 = document.createElement("div");
+                            div1.className = "card";
+
+                            var div2 = document.createElement("div");
+                            div2.className = "card-body";
+                            var p1 = document.createElement("p");
+                            var p2 = document.createElement("p");
+                            var p3 = document.createElement("p");
+
+                            p1.innerText = "Movie Name: " + myObj[i].movie_title + "          ||| Genres:  " + myObj[i].genres + "              ||| Year: " + myObj[i].title_year +
+                                "              ||| Country: " + myObj[i].country + "          ||| Language: " + myObj[i].language;
+                            p1.appendChild(document.createElement("hr"));
+                            p2.innerHTML = "Director Name: " + myObj[i].director_name + " ||||| Actor 1: " + myObj[i].actor_1_name + " ||| Actor 2: " + myObj[i].actor_2_name +
+                                " |||| Content Rating: " + myObj[i].content_rating + " ||| Budget: " + myObj[i].budget;
+                            p2.appendChild(document.createElement("hr"));
+                            p3.innerText = "Plot Keywords: " + myObj[i].plot_keywords + " ||| IMDB link: ";
+                            var aa = document.createElement("a");
+
+                            aa.href = myObj[i].movie_imdb_link;
+                            aa.innerText = "Check out here";
+                            p3.appendChild(aa);
+                            p3.appendChild(document.createElement("br"));
+                            div2.appendChild(p1);
+                            div2.appendChild(p2);
+                            div2.appendChild(p3);
+                            div1.appendChild(div2);
+                            ins.appendChild(div1);
+                            ins.appendChild(document.createElement("br"));
+
+                        }
+                    }
+                }
+            };
+            xmlhttp.open("GET", "http://starlord.hackerearth.com/movieslisting", true);
+            xmlhttp.send();
+        }
+    </script>
+</body>
+
+</html>
